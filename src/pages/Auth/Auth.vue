@@ -12,11 +12,11 @@
                     <form>
                       <div class="mb-3">
                         <label for="exampleInputEmail1" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                        <input type="email" v-model="credentials.email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                       </div>
                       <div class="mb-4">
                         <label for="exampleInputPassword1" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1">
+                        <input type="password" v-model="credentials.password" class="form-control" id="exampleInputPassword1">
                       </div>
                       <div class="d-flex align-items-center justify-content-between mb-4">
                         <div class="form-check">
@@ -27,11 +27,12 @@
                         </div>
                         <a class="text-primary fw-medium" href="authentication-forgot-password.html">Forgot Password ?</a>
                       </div>
-                      <button type="submit" @click.prevent="" class="btn btn-primary w-100 py-8 mb-4 rounded-2">
+                      <button type="submit" @click.prevent="attemptLogin()" :disabled="flagTrigger" class="btn btn-primary w-100 py-8 mb-4 rounded-2">
                         
-                        <span>Sign In</span>
+                        <span>{{ flagTrigger == true ? 'Signing In...' : 'Sign In' }}</span>
                         &nbsp;&nbsp;
                         <span
+                        v-if="flagTrigger"
                         class="spinner-border spinner-border-sm"
                         role="status"
                         aria-hidden="true"
@@ -53,16 +54,51 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '../../api'
+import Cookies from 'js-cookie'
 
 export default defineComponent({
     setup () {
+        const router = useRouter()
         const credentials = ref({
             email: '',
             password: ''
         })
         const flagTrigger = ref(false)
 
-        return { credentials, flagTrigger }
+        const attemptLogin = async () => {
+            flagTrigger.value = true
+           
+
+            try {
+                const response = await api.post('/auth/login', {
+                email: credentials.value.email,
+                password: credentials.value.password
+                })
+
+                if (response.data.status == 'success') {
+                    const token = response.data.authorization.token
+                    Cookies.set('auth_token', token, { expires: 1 / 24 })
+                    router.push({ name: 'dashboard' })
+                }else{
+                    alert(response.status.message)
+                    flagTrigger.value = false
+                }
+                
+            } catch (error) {
+                console.log('Error: ', error)
+                flagTrigger.value = false
+            }
+
+            
+        }
+
+        return { 
+            credentials, 
+            flagTrigger,
+            attemptLogin 
+        }
     }
 })
 </script>
