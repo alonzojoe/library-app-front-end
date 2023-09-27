@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js'
 
 export const encryptData = (data: any) => {
 
-    const encrypted = CryptoJS.AES.encrypt(data, import.meta.env.VITE_CRYPTO_SECRET_KEY).toSting()
+    const encrypted = CryptoJS.AES.encrypt(data, import.meta.env.VITE_CRYPTO_SECRET_KEY)
 
     return encrypted;
     

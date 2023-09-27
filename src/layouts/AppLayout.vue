@@ -1,17 +1,21 @@
 <template>
     <div>
         <router-view></router-view>
+        {{ userData }}
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
+import { decryptData } from '../composables'
+import Cookies from 'js-cookie'
 
 export default defineComponent({
     setup () {
         
+        const userData = ref(decryptData(Cookies.get('auth_user')))
 
-        return {}
+        return { userData }
     }
 })
 </script>
