@@ -13,7 +13,7 @@ const routes = [
     {
         path: '/main',
         name: 'main',
-        component: RouterBypass,
+        component: () => import('../layouts/AppLayout.vue'),
         meta: {
             requiresAuth: true
         },

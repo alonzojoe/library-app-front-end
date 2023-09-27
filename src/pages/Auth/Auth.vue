@@ -57,6 +57,7 @@ import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../../api'
 import Cookies from 'js-cookie'
+import { encryptData } from '../../composables'
 
 export default defineComponent({
     setup () {
@@ -79,6 +80,8 @@ export default defineComponent({
 
                 if (response.data.status == 'success') {
                     const token = response.data.authorization.token
+                    const authenticatedUser = encryptData(JSON.stringify(response.data.data))
+                    Cookies.set('auth_user', authenticatedUser, { expires: 1 / 24 })
                     Cookies.set('auth_token', token, { expires: 1 / 24 })
                     router.push({ name: 'dashboard' })
                 }else{
