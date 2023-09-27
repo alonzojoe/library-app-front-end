@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import RouterBypass from '../pages/Routerbypass/RouterBypass.vue'
+import Cookies from 'js-cookie'
 
 const routes = [
     {
@@ -19,7 +20,7 @@ const routes = [
         },
         children: [
             {
-                path: '/',
+                path: '',
                 name: 'dashboard',
                 component: () => import('../pages/Dashboard/Dashboard.vue')
             }
@@ -30,6 +31,19 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes,
+})
+
+router.beforeEach((to, from) => {
+    const authenticated = Cookies.get('auth_token')
+
+    if (!authenticated && to.meta.requiresAuth) {
+        return { name: 'auth' }
+    } else if (authenticated && !to.meta.requiresAuth) {
+        return { name: 'dashboard' }
+    } else {
+        return;
+    }
+
 })
 
 export default router
